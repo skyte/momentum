@@ -15,6 +15,8 @@ from datetime import date
 
 if not os.path.exists('data'):
     os.makedirs('data')
+if not os.path.exists('tmp'):
+    os.makedirs('tmp')
 
 try:
     with open(os.path.join('data','cfg.json')) as f:
