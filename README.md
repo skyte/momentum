@@ -21,3 +21,10 @@
    - Your positions list
    - A TradingView watchlist
 
+
+
+## Calculation
+
+### Momentum
+
+Exponential regression is calculated like in this TradingView Indicator: https://www.tradingview.com/script/QWHjwm4B-Exponential-Regression-Slope-Annualized-with-R-squared-Histogram/
