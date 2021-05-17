@@ -59,14 +59,14 @@ def save_nesquik_tickers():
 
 def saveResolvedTickers():
     tickers = []
+    if cfg["NQ100"]:
+        tickers = tickers + save_nesquik_tickers()
     if cfg["SP500"]:
         tickers = tickers + save_sp500_tickers()
     if cfg["SP400"]:
         tickers = tickers + save_sp400_tickers()
     if cfg["SP600"]:
         tickers = tickers + save_sp600_tickers()
-    if cfg["NQ100"]:
-        tickers = tickers + save_nesquik_tickers()
     return tickers
 
 
