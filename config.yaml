@@ -1,5 +1,10 @@
+# TD Ameritrade Config
 API_KEY: Your_API_Key
+TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
+
+# Portfolio Cash Value in $
 CASH: 5000
+# Arbitrary risk factor, the higher the factor the bigger each individual position
 RISK_FACTOR: 0.0025
 
 # Choose your universe!
@@ -8,5 +13,3 @@ SP500: true
 NQ100: false
 SP400: false
 SP600: false
-
-TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
