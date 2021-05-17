@@ -1,4 +1,4 @@
-# Momentum Stocks screener in the style of "Stocks on the Move" by Andreas Clenow
+# Momentum Stocks Screener in the Style of "Stocks on the Move" by Andreas Clenow
 ## How To Run
 1. Create TDAmeritrade Developer Account and App
 
