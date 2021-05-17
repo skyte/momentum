@@ -10,8 +10,10 @@ import pickle
 import requests
 import json
 
-
 from datetime import date
+
+# Put your consumer API key here
+API_KEY = "Your_API_Key"
 
 if not os.path.exists('data'):
     os.makedirs('data')
@@ -49,7 +51,7 @@ def save_nesquik_tickers():
     return save_tickers('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3)
 
 
-API_KEY = cfg["apiKey"] if cfg else "Your_API_Key"
+API_KEY_RESOLVED = cfg["apiKey"] if cfg else API_KEY
 TD_API = "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
 # TICKER_DATA_OUTPUT = "sp500-nasdaq-daily-{}.json".format(date.today())
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
@@ -57,7 +59,7 @@ TICKERS = save_sp500_tickers()
 # TICKERS = save_nesquik_tickers()
 
 
-def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
+def construct_params(apikey=API_KEY_RESOLVED, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""
 
     return (
