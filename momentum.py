@@ -15,6 +15,9 @@ TICKER_DATA_INPUT = os.path.join("data", "tickers_data.json")
 ACCOUNT_VALUE = 5000
 RISK_FACTOR = 0.0025
 
+if not os.path.exists('output'):
+    os.makedirs('output')
+
 def read_json(json_file):
     with open(json_file, "r") as fp:
         return json.load(fp)

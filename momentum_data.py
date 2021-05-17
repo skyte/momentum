@@ -13,6 +13,9 @@ import json
 
 from datetime import date
 
+if not os.path.exists('data'):
+    os.makedirs('data')
+
 try:
     with open(os.path.join('data','cfg.json')) as f:
       cfg = json.load(f)
