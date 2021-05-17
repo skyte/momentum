@@ -5,15 +5,23 @@ import json
 import os
 from datetime import date
 from scipy.stats import linregress
+import yaml
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_columns', None)
 
-# TICKER_DATA_INPUT = "sp500-nasdaq-daily-{}.json".format(date.today())
+try:
+    with open('config.yaml', 'r') as stream:
+        cfg = yaml.safe_load(stream)
+except FileNotFoundError:
+    cfg = None
+except yaml.YAMLError as exc:
+        print(exc)
+
 TICKER_DATA_INPUT = os.path.join("data", "tickers_data.json")
-ACCOUNT_VALUE = 5000
-RISK_FACTOR = 0.0025
+ACCOUNT_VALUE = cfg["CASH"]
+RISK_FACTOR = cfg["RISK_FACTOR"]
 
 if not os.path.exists('output'):
     os.makedirs('output')

@@ -8,12 +8,9 @@ import os
 import pandas_datareader.data as web
 import pickle
 import requests
-import json
+import yaml
 
 from datetime import date
-
-# Put your consumer API key here
-API_KEY = "Your_API_Key"
 
 if not os.path.exists('data'):
     os.makedirs('data')
@@ -21,10 +18,20 @@ if not os.path.exists('tmp'):
     os.makedirs('tmp')
 
 try:
-    with open(os.path.join('data','cfg.json')) as f:
-      cfg = json.load(f)
+    with open(os.path.join('data','p_cfg.yaml'), 'r') as stream:
+        p_cfg = yaml.safe_load(stream)
+except FileNotFoundError:
+    p_cfg = None
+except yaml.YAMLError as exc:
+        print(exc)
+
+try:
+    with open('config.yaml', 'r') as stream:
+        cfg = yaml.safe_load(stream)
 except FileNotFoundError:
     cfg = None
+except yaml.YAMLError as exc:
+        print(exc)
 
 def save_tickers(url, tickerPos = 1, tablePos = 1):
     resp = requests.get(url)
@@ -50,16 +57,26 @@ def save_sp600_tickers():
 def save_nesquik_tickers():
     return save_tickers('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3)
 
+def saveResolvedTickers():
+    tickers = []
+    if cfg["SP500"]:
+        tickers = tickers + save_sp500_tickers()
+    if cfg["SP400"]:
+        tickers = tickers + save_sp400_tickers()
+    if cfg["SP600"]:
+        tickers = tickers + save_sp600_tickers()
+    if cfg["NQ100"]:
+        tickers = tickers + save_nesquik_tickers()
+    return tickers
 
-API_KEY_RESOLVED = cfg["apiKey"] if cfg else API_KEY
-TD_API = "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
-# TICKER_DATA_OUTPUT = "sp500-nasdaq-daily-{}.json".format(date.today())
+
+API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
+TD_API = cfg["TICKERS_API"]
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
-TICKERS = save_sp500_tickers()
-# TICKERS = save_nesquik_tickers()
+TICKERS = saveResolvedTickers()
 
 
-def construct_params(apikey=API_KEY_RESOLVED, period_type="year", period=1, frequency_type="daily", frequency=1):
+def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""
 
     return (
