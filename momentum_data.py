@@ -33,47 +33,38 @@ except FileNotFoundError:
 except yaml.YAMLError as exc:
         print(exc)
 
-def save_tickers(url, tickerPos = 1, tablePos = 1):
+def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1):
     resp = requests.get(url)
     soup = bs.BeautifulSoup(resp.text, 'lxml')
     table = soup.findAll('table', {'class': 'wikitable sortable'})[tablePos-1]
-    tickers = []
+    secs = []
     for row in table.findAll('tr')[tablePos:]:
-        ticker = row.findAll('td')[tickerPos-1].text
-        tickers.append(ticker.strip())
+        sec = {}
+        sec["ticker"] = row.findAll('td')[tickerPos-1].text.strip()
+        sec["sector"] = row.findAll('td')[tickerPos+sectorPosOffset-1].text
+        secs.append(sec)
     with open(os.path.join("tmp", "tickers.pickle"), "wb") as f:
-        pickle.dump(tickers, f)
-    return tickers
+        pickle.dump(secs, f)
+    return secs
 
-def save_sp400_tickers():
-    return save_tickers('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2)
 
-def save_sp500_tickers():
-    return save_tickers('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-
-def save_sp600_tickers():
-    return save_tickers('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2)
-
-def save_nesquik_tickers():
-    return save_tickers('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3)
-
-def saveResolvedTickers():
+def saveResolvedSecurities():
     tickers = []
     if cfg["NQ100"]:
-        tickers = tickers + save_nesquik_tickers()
+        tickers = tickers + getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3)
     if cfg["SP500"]:
-        tickers = tickers + save_sp500_tickers()
+        tickers = tickers + getSecurities('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies', sectorPosOffset=2)
     if cfg["SP400"]:
-        tickers = tickers + save_sp400_tickers()
+        tickers = tickers + getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2)
     if cfg["SP600"]:
-        tickers = tickers + save_sp600_tickers()
+        tickers = tickers + getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2)
     return tickers
 
 
 API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
 TD_API = cfg["TICKERS_API"]
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
-TICKERS = saveResolvedTickers()
+SECURITIES = saveResolvedSecurities()
 
 
 def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
@@ -88,36 +79,37 @@ def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_typ
     ) 
     
 
-def read_tickers(ticker_list=TICKERS):
+def read_tickers(ticker_list=SECURITIES):
     """Reads list of tickers from a .txt file, expects one line per ticker"""
     with open(ticker_list, "r") as fp:
         return [ticker.strip() for ticker in fp.readlines()]
 
 
 
-def process_ticker_json(ticker_dict, ticker_response):
+def process_ticker_json(ticker_dict, ticker_response, security):
     """Processes ticker json data into global ticker dict""" 
-    symbol = ticker_response["symbol"]
+    symbol = security["ticker"]
+    ticker_response["sector"] = security["sector"]
     ticker_dict[symbol] = ticker_response
 
         
 
 def main():
     headers = {"Cache-Control" : "no-cache"}
-    tickers = TICKERS
+    secs = SECURITIES
     params = construct_params()
     ticker_dict = {}
 
-    for idx, ticker in enumerate(tickers):
+    for idx, sec in enumerate(secs):
         response = requests.get(
-                TD_API % ticker,
+                TD_API % sec["ticker"],
                 params=params,
                 headers=headers
         )
         # rate limit for td is 120 req/min
         time.sleep(0.5)
-        process_ticker_json(ticker_dict, response.json())
-        print(ticker, response.status_code)
+        process_ticker_json(ticker_dict, response.json(), sec)
+        print(sec["ticker"], response.status_code)
     
     with open(TICKER_DATA_OUTPUT, "w") as fp:
         json.dump(ticker_dict, fp)

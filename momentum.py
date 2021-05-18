@@ -71,16 +71,17 @@ def positions():
                 print("Ticker %s has a gap > 15%%" % ticker)
                 print(momentum(pd.Series(closes).tail(90)))
             else:
-                momentums.append((0, ticker, momentum(pd.Series(closes).tail(90)), atr_20(json[ticker]["candles"]), closes[-1]))
+                momentums.append((0, ticker, json[ticker]["sector"], momentum(pd.Series(closes).tail(90)), atr_20(json[ticker]["candles"]), closes[-1]))
                 ranks.append(len(ranks)+1)
     titleRank = "Rank"
     titleTicker = "Ticker"
+    titleSector = "Sector"
     titleMom = "Momentum (%)"
     titleRisk = "ATR20d"
     titlePrice = "Price"
     titleAmount = "Shares"
     titlePosSize = "Position ($)"
-    df = pd.DataFrame(momentums, columns=[titleRank, titleTicker, titleMom, titleRisk, titlePrice])
+    df = pd.DataFrame(momentums, columns=[titleRank, titleTicker, titleSector, titleMom, titleRisk, titlePrice])
     # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
     df[titleAmount] = (np.floor(ACCOUNT_VALUE * RISK_FACTOR / df[titleRisk])).astype(int)
     df[titlePosSize] = np.round(df[titleAmount] * df[titlePrice], 2)
