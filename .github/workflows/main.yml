@@ -25,6 +25,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Package Application
+        uses: JackMcKew/pyinstaller-action-windows@main
+        with:
+          path: ./
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: name-of-artifact
+        path: dist/windows
+
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
