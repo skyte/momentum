@@ -63,10 +63,7 @@ def get_resolved_securities():
         tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2, universe="S&P 600"))
     return tickers
 
-try:
-    API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
-except:
-    API_KEY = cfg["API_KEY"]
+API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
 TD_API = cfg["TICKERS_API"]
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
 SECURITIES = get_resolved_securities().values()

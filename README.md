@@ -1,7 +1,7 @@
 # Momentum Stocks Screener in the Style of "Stocks on the Move" by Andreas Clenow
 ## How To Run
 1. Open `config.yaml` and put in your preferences 
-2. Run `momentum.py`
+2. Run `momentum.py` **from the folder it is in**!
 3. In the `output` folder you find
    - `momentum_positions.csv` - Your positions list
    - `Momentum.txt` - A TradingView watchlist
