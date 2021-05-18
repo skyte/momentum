@@ -36,8 +36,8 @@ except FileNotFoundError:
     cfg = None
 except yaml.YAMLError as exc:
         print(exc)
-            
-    
+
+
 def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, universe = "N/A"):
     resp = requests.get(url)
     soup = bs.BeautifulSoup(resp.text, 'lxml')
@@ -71,6 +71,13 @@ TICKER_DATA_OUTPUT = os.path.join(DIR, "data", "tickers_data.json")
 SECURITIES = get_resolved_securities().values()
 DATA_SOURCE = cfg["DATA_SOURCE"]
 
+def create_tickers_data_file(tickers_dict):
+    with open(TICKER_DATA_OUTPUT, "w") as fp:
+        json.dump(tickers_dict, fp)
+
+def enrich_ticker_data(ticker_response, security):
+    ticker_response["sector"] = security["sector"]
+
 def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""
 
@@ -80,19 +87,7 @@ def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_typ
            ("period", period),
            ("frequencyType", frequency_type),
            ("frequency", frequency)
-    ) 
-
-def read_tickers(ticker_list=SECURITIES):
-    """Reads list of tickers from a .txt file, expects one line per ticker"""
-    with open(ticker_list, "r") as fp:
-        return [ticker.strip() for ticker in fp.readlines()]
-
-def process_ticker_json(ticker_response, security):
-    ticker_response["sector"] = security["sector"]
-
-def create_tickers_data_file(tickers_dict):
-    with open(TICKER_DATA_OUTPUT, "w") as fp:
-        json.dump(tickers_dict, fp)
+    )
 
 def save_from_tda(securities):
     headers = {"Cache-Control" : "no-cache"}
@@ -108,11 +103,11 @@ def save_from_tda(securities):
         # rate limit for td is 120 req/min
         time.sleep(0.5)
         ticker_data = response.json()
-        process_ticker_json(ticker_data, sec)
+        enrich_ticker_data(ticker_data, sec)
         tickers_dict[sec["ticker"]] = ticker_data
         errorText = f' Error with code {response.status_code}' if response.status_code != 200 else ''
         print(f'{sec["ticker"]} from {sec["universe"]}{errorText} ({idx+1} / {len(securities)})')
-    
+
     create_tickers_data_file(tickers_dict)
 
 
@@ -140,7 +135,7 @@ def get_yf_data(security, start_date, end_date):
             candles.append(candle)
 
         ticker_data["candles"] = candles
-        process_ticker_json(ticker_data, security)
+        enrich_ticker_data(ticker_data, security)
         return ticker_data
 
 def save_from_yahoo(securities):
@@ -158,11 +153,10 @@ def save_data(source, securities):
         save_from_yahoo(securities)
     elif source == "TD_AMERITRADE":
         save_from_tda(securities)
-    
+
 
 def main():
     save_data(DATA_SOURCE, SECURITIES)
-    
 
 if __name__ == "__main__":
     main()

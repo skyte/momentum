@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 import numpy as np
-import json 
+import json
 import os
 from datetime import date
 from scipy.stats import linregress
