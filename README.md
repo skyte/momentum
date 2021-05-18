@@ -29,7 +29,7 @@ Instead of running `momentum.py` you can also:
 ### \*\*\* Output \*\*\*
 
 - in the `output` folder you will find:
-  - your default (i.e. momentum calculated over the last 90 days) list of positions: `momentum.csv`
+  - your default (i.e. momentum calculated over the last 90 days) list of positions: `positions.csv`
   - your default TradingView watchlist: `Momentum.txt`
   - as well as the same thing for all other momentum calculations that you defined
     - in`config.yaml` add or remove values from `MOMENTUM_CALCULATION_PAST_DAYS`
