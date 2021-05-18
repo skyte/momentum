@@ -91,6 +91,7 @@ def positions():
     title_amount = "Shares"
     title_pos_size = "Position ($)"
     slope_std = SLOPE_DAYS[0]
+    dfs = []
     for slope_days in SLOPE_DAYS:
         slope_suffix = f'_{slope_days}' if slope_days != slope_std else ''
         df = pd.DataFrame(momentums[slope_days], columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
@@ -105,12 +106,14 @@ def positions():
         watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
         watchlist.close()
 
-    return df
+        dfs.append(df)
+
+    return dfs
 
 
 def main():
     posis = positions() 
-    print(posis)
+    print(posis[0])
 
 if __name__ == "__main__":
     main()
