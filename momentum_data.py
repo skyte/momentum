@@ -108,13 +108,13 @@ def save_from_tda(securities):
         ticker_data = response.json()
         process_ticker_json(ticker_data, sec)
         tickers_dict[sec["ticker"]] = ticker_data
-        print(f'{sec["universe"]}: {sec["ticker"]} {response.status_code}')
+        errorText = f' Error with code {response.status_code}' if response.status_code != 200 else ''
+        print(f'{sec["ticker"]} from {sec["universe"]}{errorText} ({idx+1} / {len(securities)})')
     
     create_tickers_data_file(tickers_dict)
 
 
 def get_yf_data(security, start_date, end_date):
-        print(f'{security["universe"]}: {security["ticker"]}')
         df = yf.download(security["ticker"], start=start_date, end=end_date)
         yahoo_response = df.to_dict()
         timestamps = list(yahoo_response["Open"].keys())
@@ -145,9 +145,10 @@ def save_from_yahoo(securities):
     today = date.today()
     start_date = today - dt.timedelta(days=1*365)
     tickers_dict = {}
-    for sec in securities:
-        ticker_data = get_yf_data(sec, start_date, today)
-        tickers_dict[sec["ticker"]] = ticker_data
+    for idx, security in enumerate(securities):
+        print(f'{security["ticker"]} from {security["universe"]} ({idx+1} / {len(securities)})')
+        ticker_data = get_yf_data(security, start_date, today)
+        tickers_dict[security["ticker"]] = ticker_data
     create_tickers_data_file(tickers_dict)
 
 def save_data(source, securities):
