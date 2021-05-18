@@ -33,7 +33,7 @@ except FileNotFoundError:
 except yaml.YAMLError as exc:
         print(exc)
 
-def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1):
+def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, universe = "N/A"):
     resp = requests.get(url)
     soup = bs.BeautifulSoup(resp.text, 'lxml')
     table = soup.findAll('table', {'class': 'wikitable sortable'})[tablePos-1]
@@ -41,7 +41,8 @@ def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1):
     for row in table.findAll('tr')[tablePos:]:
         sec = {}
         sec["ticker"] = row.findAll('td')[tickerPos-1].text.strip()
-        sec["sector"] = row.findAll('td')[tickerPos+sectorPosOffset-1].text
+        sec["sector"] = row.findAll('td')[tickerPos-1+sectorPosOffset].text.strip()
+        sec["universe"] = universe
         secs[sec["ticker"]] = sec
     with open(os.path.join("tmp", "tickers.pickle"), "wb") as f:
         pickle.dump(secs, f)
@@ -50,13 +51,13 @@ def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1):
 def get_resolved_securities():
     tickers = {}
     if cfg["NQ100"]:
-        tickers.update(getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3))
+        tickers.update(getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3, universe="Nasdaq 100"))
     if cfg["SP500"]:
-        tickers.update(getSecurities('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies', sectorPosOffset=2))
+        tickers.update(getSecurities('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies', sectorPosOffset=3, universe="S&P 500"))
     if cfg["SP400"]:
-        tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2))
+        tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2, universe="S&P 400"))
     if cfg["SP600"]:
-        tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2))
+        tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2, universe="S&P 600"))
     return tickers
 
 API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
@@ -101,7 +102,7 @@ def main():
         # rate limit for td is 120 req/min
         time.sleep(0.5)
         process_ticker_json(ticker_dict, response.json(), sec)
-        print(sec["ticker"], response.status_code)
+        print(f'{sec["universe"]}: {sec["ticker"]} {response.status_code}')
     
     with open(TICKER_DATA_OUTPUT, "w") as fp:
         json.dump(ticker_dict, fp)
