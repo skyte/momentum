@@ -3,11 +3,19 @@
 1. Create TDAmeritrade Developer Account and App
 2. Open `config.yaml` and put in your preferences
    - Don't forget to put in your `API_KEY`! 
-3. Run `momentum_data.py` to aggregate the price data
-4. Run `momentum.py` to aggregate your momentum positions list
-5. In the `output` folder you find
+3. Run `momentum.py`
+4. In the `output` folder you find
    - `momentum_positions.csv` - Your positions list
    - `Momentum.txt` - A TradingView watchlist
+
+
+
+#### Separate Steps
+
+Instead of running `momentum.py` you can also:
+
+1. Run `momentum_data.py` to aggregate the price data
+2. Run `momentum_posis.py` to aggregate your momentum positions list
 
 
 
