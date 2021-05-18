@@ -69,14 +69,15 @@ def positions():
                 diffs = np.abs(pd.Series(closes).pct_change().diff()).dropna()
                 gaps = diffs[diffs > 0.15]
                 ma = pd.Series(closes).rolling(100).mean().tail(1).item()
+                mmntm = momentum(pd.Series(closes).tail(SLOPE_DAYS))
                 if ma > closes[-1]:
                     print("Ticker %s below 100d moving average." % ticker)
-                    print(momentum(pd.Series(closes).tail(SLOPE_DAYS)))
+                    print(mmntm)
                 elif len(gaps):
                     print("Ticker %s has a gap > 15%%" % ticker)
-                    print(momentum(pd.Series(closes).tail(SLOPE_DAYS)))
+                    print(mmntm)
                 else:
-                    momentums.append((0, ticker, json[ticker]["sector"], momentum(pd.Series(closes).tail(SLOPE_DAYS)), atr_20(json[ticker]["candles"]), closes[-1]))
+                    momentums.append((0, ticker, json[ticker]["sector"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
                     ranks.append(len(ranks)+1)
         except KeyError:
             print(f'Ticker {ticker} has corrupted data.')
