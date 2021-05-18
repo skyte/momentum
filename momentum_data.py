@@ -47,7 +47,7 @@ def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1):
         pickle.dump(secs, f)
     return secs
 
-def getResolvedSecurities():
+def get_resolved_securities():
     tickers = {}
     if cfg["NQ100"]:
         tickers.update(getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3))
@@ -62,7 +62,7 @@ def getResolvedSecurities():
 API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
 TD_API = cfg["TICKERS_API"]
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
-SECURITIES = getResolvedSecurities().values()
+SECURITIES = get_resolved_securities().values()
 
 def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""

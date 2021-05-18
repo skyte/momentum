@@ -74,24 +74,24 @@ def positions():
             else:
                 momentums.append((0, ticker, json[ticker]["sector"], momentum(pd.Series(closes).tail(90)), atr_20(json[ticker]["candles"]), closes[-1]))
                 ranks.append(len(ranks)+1)
-    titleRank = "Rank"
-    titleTicker = "Ticker"
-    titleSector = "Sector"
-    titleMom = "Momentum (%)"
-    titleRisk = "ATR20d"
-    titlePrice = "Price"
-    titleAmount = "Shares"
-    titlePosSize = "Position ($)"
-    df = pd.DataFrame(momentums, columns=[titleRank, titleTicker, titleSector, titleMom, titleRisk, titlePrice])
+    title_rank = "Rank"
+    title_ticker = "Ticker"
+    title_sector = "Sector"
+    title_momentum = "Momentum (%)"
+    title_risk = "ATR20d"
+    title_price = "Price"
+    title_amount = "Shares"
+    title_pos_size = "Position ($)"
+    df = pd.DataFrame(momentums, columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
     # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
-    df[titleAmount] = (np.floor(ACCOUNT_VALUE * RISK_FACTOR / df[titleRisk])).astype(int)
-    df[titlePosSize] = np.round(df[titleAmount] * df[titlePrice], 2)
-    df = df.sort_values(([titleMom]), ascending=False)
-    df[titleRank] = ranks
+    df[title_amount] = (np.floor(ACCOUNT_VALUE * RISK_FACTOR / df[title_risk])).astype(int)
+    df[title_pos_size] = np.round(df[title_amount] * df[title_price], 2)
+    df = df.sort_values(([title_momentum]), ascending=False)
+    df[title_rank] = ranks
     df.head(MAX_STOCKS).to_csv(os.path.join("output", "momentum_positions.csv"), index = False)
 
     watchlist = open(os.path.join("output", "Momentum.txt"), "w")
-    watchlist.write(','.join(df.head(MAX_STOCKS)[titleTicker]))
+    watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
     watchlist.close()
 
     return df
