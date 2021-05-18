@@ -58,7 +58,7 @@ def atr_20(candles):
 def positions():
     """Returns a dataframe doubly sorted by deciles and momentum factor, with atr and position size"""
     json = read_json(TICKER_DATA_INPUT)
-    momentums = []
+    momentums = {}
     ranks = []
     for ticker in json:
         closes = []
@@ -69,16 +69,17 @@ def positions():
                 diffs = np.abs(pd.Series(closes).pct_change().diff()).dropna()
                 gaps = diffs[diffs > 0.15]
                 ma = pd.Series(closes).rolling(100).mean().tail(1).item()
-                mmntm = momentum(pd.Series(closes).tail(SLOPE_DAYS))
                 if ma > closes[-1]:
-                    print("Ticker %s below 100d moving average." % ticker)
-                    print(mmntm)
+                    print("%s is below it's 100d moving average." % ticker)
                 elif len(gaps):
-                    print("Ticker %s has a gap > 15%%" % ticker)
-                    print(mmntm)
+                    print("%s has a gap > 15%%" % ticker)
                 else:
-                    momentums.append((0, ticker, json[ticker]["sector"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
                     ranks.append(len(ranks)+1)
+                    for slope_days in SLOPE_DAYS:
+                        if not slope_days in momentums:
+                            momentums[slope_days] = []
+                        mmntm = momentum(pd.Series(closes).tail(slope_days))
+                        momentums[slope_days].append((0, ticker, json[ticker]["sector"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
         except KeyError:
             print(f'Ticker {ticker} has corrupted data.')
     title_rank = "Rank"
@@ -89,17 +90,20 @@ def positions():
     title_price = "Price"
     title_amount = "Shares"
     title_pos_size = "Position ($)"
-    df = pd.DataFrame(momentums, columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
-    # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
-    df[title_amount] = (np.floor(ACCOUNT_VALUE * RISK_FACTOR / df[title_risk])).astype(int)
-    df[title_pos_size] = np.round(df[title_amount] * df[title_price], 2)
-    df = df.sort_values(([title_momentum]), ascending=False)
-    df[title_rank] = ranks
-    df.head(MAX_STOCKS).to_csv(os.path.join(DIR, "output", "momentum_positions.csv"), index = False)
+    slope_std = SLOPE_DAYS[0]
+    for slope_days in SLOPE_DAYS:
+        slope_suffix = f'_{slope_days}' if slope_days != slope_std else ''
+        df = pd.DataFrame(momentums[slope_days], columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
+        # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
+        df[title_amount] = (np.floor(ACCOUNT_VALUE * RISK_FACTOR / df[title_risk])).astype(int)
+        df[title_pos_size] = np.round(df[title_amount] * df[title_price], 2)
+        df = df.sort_values(([title_momentum]), ascending=False)
+        df[title_rank] = ranks
+        df.head(MAX_STOCKS).to_csv(os.path.join(DIR, "output", f'momentum_positions{slope_suffix}.csv'), index = False)
 
-    watchlist = open(os.path.join(DIR, "output", "Momentum.txt"), "w")
-    watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
-    watchlist.close()
+        watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")
+        watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
+        watchlist.close()
 
     return df
 

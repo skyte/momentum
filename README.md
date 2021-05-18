@@ -16,9 +16,6 @@
 1. Open `config.yaml` and put in your preferences 
 2. Install requirements: `python -m pip install -r requirements.txt`
 3. Run `momentum.py`
-4. In the `output` folder you find
-   - `momentum_positions.csv` - Your positions list
-   - `Momentum.txt` - A TradingView watchlist
 
 #### Separate Steps
 
@@ -26,6 +23,16 @@ Instead of running `momentum.py` you can also:
 
 1. Run `momentum_data.py` to aggregate the price data
 2. Run `momentum_posis.py` to aggregate your momentum positions list
+
+
+
+### \*\*\* Output \*\*\*
+
+- in the `output` folder you will find:
+  - your default (i.e. momentum calculated over the last 90 days) list of positions: `momentum.csv`
+  - your default TradingView watchlist: `Momentum.txt`
+  - as well as the same thing for all other momentum calculations that you defined
+    - in`config.yaml` add or remove values from `MOMENTUM_CALCULATION_PAST_DAYS`
 
 
 

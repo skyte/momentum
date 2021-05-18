@@ -19,5 +19,7 @@ SP400: false
 SP600: false
 
 # Calculation
-# Standard: 90
-MOMENTUM_CALCULATION_PAST_DAYS: 90
+# Standard: 90, you can add as many as you want
+MOMENTUM_CALCULATION_PAST_DAYS: 
+  - 90
+  - 120
