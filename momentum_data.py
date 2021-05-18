@@ -22,21 +22,23 @@ if not os.path.exists(os.path.join(DIR, 'tmp')):
     os.makedirs(os.path.join(DIR, 'tmp'))
 
 try:
-    with open(os.path.join(DIR, 'data','p_cfg.yaml'), 'r') as stream:
-        p_cfg = yaml.safe_load(stream)
+    with open(os.path.join(DIR, 'config_private.yaml'), 'r') as stream:
+        private_config = yaml.safe_load(stream)
 except FileNotFoundError:
-    p_cfg = None
+    private_config = None
 except yaml.YAMLError as exc:
         print(exc)
 
 try:
     with open('config.yaml', 'r') as stream:
-        cfg = yaml.safe_load(stream)
+        config = yaml.safe_load(stream)
 except FileNotFoundError:
-    cfg = None
+    config = None
 except yaml.YAMLError as exc:
         print(exc)
 
+def cfg(key):
+    return private_config[key] if private_config else config[key]
 
 def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, universe = "N/A"):
     resp = requests.get(url)
@@ -55,21 +57,21 @@ def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, univers
 
 def get_resolved_securities():
     tickers = {}
-    if cfg["NQ100"]:
+    if cfg("NQ100"):
         tickers.update(getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3, universe="Nasdaq 100"))
-    if cfg["SP500"]:
+    if cfg("SP500"):
         tickers.update(getSecurities('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies', sectorPosOffset=3, universe="S&P 500"))
-    if cfg["SP400"]:
+    if cfg("SP400"):
         tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2, universe="S&P 400"))
-    if cfg["SP600"]:
+    if cfg("SP600"):
         tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2, universe="S&P 600"))
     return tickers
 
-API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
-TD_API = cfg["TICKERS_API"]
+API_KEY = cfg("API_KEY")
+TD_API = cfg("TICKERS_API")
 TICKER_DATA_OUTPUT = os.path.join(DIR, "data", "tickers_data.json")
 SECURITIES = get_resolved_securities().values()
-DATA_SOURCE = cfg["DATA_SOURCE"]
+DATA_SOURCE = cfg("DATA_SOURCE")
 
 def create_tickers_data_file(tickers_dict):
     with open(TICKER_DATA_OUTPUT, "w") as fp:

@@ -6,6 +6,7 @@ import os
 from datetime import date
 from scipy.stats import linregress
 import yaml
+from momentum_data import cfg
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -15,17 +16,17 @@ pd.set_option('display.max_columns', None)
 
 try:
     with open('config.yaml', 'r') as stream:
-        cfg = yaml.safe_load(stream)
+        config = yaml.safe_load(stream)
 except FileNotFoundError:
-    cfg = None
+    config = None
 except yaml.YAMLError as exc:
         print(exc)
 
 TICKER_DATA_INPUT = os.path.join(DIR, "data", "tickers_data.json")
-ACCOUNT_VALUE = cfg["CASH"]
-RISK_FACTOR = cfg["RISK_FACTOR"]
-MAX_STOCKS = cfg["STOCKS_COUNT_OUTPUT"]
-SLOPE_DAYS = cfg["MOMENTUM_CALCULATION_PAST_DAYS"]
+ACCOUNT_VALUE = cfg("CASH")
+RISK_FACTOR = cfg("RISK_FACTOR")
+MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
+SLOPE_DAYS = cfg("MOMENTUM_CALCULATION_PAST_DAYS")
 
 if not os.path.exists('output'):
     os.makedirs('output')

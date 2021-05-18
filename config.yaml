@@ -22,5 +22,5 @@ SP600: false
 # Standard is 90, but you can have as many as you want
 MOMENTUM_CALCULATION_PAST_DAYS:
   - 90
-  - 120
-  - 250
+  # - 120
+  # - 250

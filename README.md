@@ -36,7 +36,13 @@ Instead of running `momentum.py` you can also:
 
 
 
-### Data Sources
+### Config
+
+#### Private File
+
+Copy `config.yaml` and name it `config_private.yaml`. Change whatever you want, it will take priority.
+
+#### Data Sources
 
 ##### Yahoo Finance
 
