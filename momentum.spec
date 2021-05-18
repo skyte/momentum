@@ -5,9 +5,8 @@ block_cipher = None
 
 
 a = Analysis(['momentum.py'],
-             pathex=['D:\\git\\momentum'],
              binaries=[],
-             datas=[],
+             datas=[( 'config.yaml', '.' )],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
