@@ -7,7 +7,7 @@ TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
 # Portfolio Cash Value in $
 CASH: 5000
 # Arbitrary risk factor, the higher the factor the bigger each individual position
-RISK_FACTOR: 0.0025
+RISK_FACTOR: 0.0020
 # How many stocks do you want to see in the end?
 STOCKS_COUNT_OUTPUT: 50
 

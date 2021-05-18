@@ -91,6 +91,7 @@ def positions():
     title_price = "Price"
     title_amount = "Shares"
     title_pos_size = "Position ($)"
+    title_sum = "Sum ($)"
     slope_std = SLOPE_DAYS[0]
     dfs = []
     for slope_days in SLOPE_DAYS:
@@ -101,6 +102,12 @@ def positions():
         df[title_pos_size] = np.round(df[title_amount] * df[title_price], 2)
         df = df.sort_values(([title_momentum]), ascending=False)
         df[title_rank] = ranks
+        sum = 0
+        sums = []
+        for position in list(df[title_pos_size]):
+            sum = sum + position
+            sums.append(sum)
+        df[title_sum] = sums
         df.head(MAX_STOCKS).to_csv(os.path.join(DIR, "output", f'positions{slope_suffix}.csv'), index = False)
 
         watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")
