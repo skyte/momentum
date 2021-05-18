@@ -22,6 +22,7 @@ except yaml.YAMLError as exc:
 TICKER_DATA_INPUT = os.path.join("data", "tickers_data.json")
 ACCOUNT_VALUE = cfg["CASH"]
 RISK_FACTOR = cfg["RISK_FACTOR"]
+MAX_STOCKS = cfg["STOCKS_COUNT_OUTPUT"]
 
 if not os.path.exists('output'):
     os.makedirs('output')
@@ -87,10 +88,10 @@ def positions():
     df[titlePosSize] = np.round(df[titleAmount] * df[titlePrice], 2)
     df = df.sort_values(([titleMom]), ascending=False)
     df[titleRank] = ranks
-    df.head(50).to_csv(os.path.join("output", "momentum_positions.csv"), index = False)
+    df.head(MAX_STOCKS).to_csv(os.path.join("output", "momentum_positions.csv"), index = False)
 
     watchlist = open(os.path.join("output", "Momentum.txt"), "w")
-    watchlist.write(','.join(df.head(50)[titleTicker]))
+    watchlist.write(','.join(df.head(MAX_STOCKS)[titleTicker]))
     watchlist.close()
 
     return df

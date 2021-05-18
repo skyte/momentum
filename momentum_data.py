@@ -37,35 +37,32 @@ def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1):
     resp = requests.get(url)
     soup = bs.BeautifulSoup(resp.text, 'lxml')
     table = soup.findAll('table', {'class': 'wikitable sortable'})[tablePos-1]
-    secs = []
+    secs = {}
     for row in table.findAll('tr')[tablePos:]:
         sec = {}
         sec["ticker"] = row.findAll('td')[tickerPos-1].text.strip()
         sec["sector"] = row.findAll('td')[tickerPos+sectorPosOffset-1].text
-        secs.append(sec)
+        secs[sec["ticker"]] = sec
     with open(os.path.join("tmp", "tickers.pickle"), "wb") as f:
         pickle.dump(secs, f)
     return secs
 
-
-def saveResolvedSecurities():
-    tickers = []
+def getResolvedSecurities():
+    tickers = {}
     if cfg["NQ100"]:
-        tickers = tickers + getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3)
+        tickers.update(getSecurities('https://en.wikipedia.org/wiki/Nasdaq-100', 2, 3))
     if cfg["SP500"]:
-        tickers = tickers + getSecurities('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies', sectorPosOffset=2)
+        tickers.update(getSecurities('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies', sectorPosOffset=2))
     if cfg["SP400"]:
-        tickers = tickers + getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2)
+        tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', 2))
     if cfg["SP600"]:
-        tickers = tickers + getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2)
+        tickers.update(getSecurities('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', 2))
     return tickers
-
 
 API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
 TD_API = cfg["TICKERS_API"]
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
-SECURITIES = saveResolvedSecurities()
-
+SECURITIES = getResolvedSecurities().values()
 
 def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""
@@ -77,22 +74,17 @@ def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_typ
            ("frequencyType", frequency_type),
            ("frequency", frequency)
     ) 
-    
 
 def read_tickers(ticker_list=SECURITIES):
     """Reads list of tickers from a .txt file, expects one line per ticker"""
     with open(ticker_list, "r") as fp:
         return [ticker.strip() for ticker in fp.readlines()]
 
-
-
 def process_ticker_json(ticker_dict, ticker_response, security):
     """Processes ticker json data into global ticker dict""" 
     symbol = security["ticker"]
     ticker_response["sector"] = security["sector"]
-    ticker_dict[symbol] = ticker_response
-
-        
+    ticker_dict[symbol] = ticker_response 
 
 def main():
     headers = {"Cache-Control" : "no-cache"}
