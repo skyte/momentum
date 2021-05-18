@@ -6,6 +6,8 @@ TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
 CASH: 5000
 # Arbitrary risk factor, the higher the factor the bigger each individual position
 RISK_FACTOR: 0.0025
+# How many stocks do you want to see in the end?
+STOCKS_COUNT_OUTPUT: 50
 
 # Choose your universe!
 # Only those stocks are considered which are included in the enabled indexes
