@@ -11,16 +11,15 @@ import requests
 import yaml
 import yfinance as yf
 import pandas as pd
-import pathlib
 
 from datetime import date
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 
-if not os.path.exists('data'):
-    os.makedirs('data')
-if not os.path.exists('tmp'):
-    os.makedirs('tmp')
+if not os.path.exists(os.path.join(DIR, 'data')):
+    os.makedirs(os.path.join(DIR, 'data'))
+if not os.path.exists(os.path.join(DIR, 'tmp')):
+    os.makedirs(os.path.join(DIR, 'tmp'))
 
 try:
     with open(os.path.join(DIR, 'data','p_cfg.yaml'), 'r') as stream:
