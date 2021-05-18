@@ -30,10 +30,10 @@ jobs:
         with:
           path: .
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: name-of-artifact
-        path: dist/windows
+      - uses: actions/upload-artifact@v2
+        with:
+          name: name-of-artifact
+          path: dist/windows
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
