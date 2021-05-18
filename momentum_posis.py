@@ -76,7 +76,7 @@ def positions():
                     print("Ticker %s has a gap > 15%%" % ticker)
                     print(momentum(pd.Series(closes).tail(SLOPE_DAYS)))
                 else:
-                    momentums.append((0, ticker, json[ticker]["sector"], momentum(pd.Series(closes).tail(90)), atr_20(json[ticker]["candles"]), closes[-1]))
+                    momentums.append((0, ticker, json[ticker]["sector"], momentum(pd.Series(closes).tail(SLOPE_DAYS)), atr_20(json[ticker]["candles"]), closes[-1]))
                     ranks.append(len(ranks)+1)
         except KeyError:
             print(f'Ticker {ticker} has corrupted data.')
