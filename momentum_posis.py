@@ -7,6 +7,8 @@ from datetime import date
 from scipy.stats import linregress
 import yaml
 
+DIR = os.path.dirname(os.path.realpath(__file__))
+
 pd.set_option('display.max_rows', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_columns', None)
@@ -19,7 +21,7 @@ except FileNotFoundError:
 except yaml.YAMLError as exc:
         print(exc)
 
-TICKER_DATA_INPUT = os.path.join("data", "tickers_data.json")
+TICKER_DATA_INPUT = os.path.join(DIR, "data", "tickers_data.json")
 ACCOUNT_VALUE = cfg["CASH"]
 RISK_FACTOR = cfg["RISK_FACTOR"]
 MAX_STOCKS = cfg["STOCKS_COUNT_OUTPUT"]
@@ -91,9 +93,9 @@ def positions():
     df[title_pos_size] = np.round(df[title_amount] * df[title_price], 2)
     df = df.sort_values(([title_momentum]), ascending=False)
     df[title_rank] = ranks
-    df.head(MAX_STOCKS).to_csv(os.path.join("output", "momentum_positions.csv"), index = False)
+    df.head(MAX_STOCKS).to_csv(os.path.join(DIR, "output", "momentum_positions.csv"), index = False)
 
-    watchlist = open(os.path.join("output", "Momentum.txt"), "w")
+    watchlist = open(os.path.join(DIR, "output", "Momentum.txt"), "w")
     watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
     watchlist.close()
 

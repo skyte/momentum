@@ -11,8 +11,11 @@ import requests
 import yaml
 import yfinance as yf
 import pandas as pd
+import pathlib
 
 from datetime import date
+
+DIR = os.path.dirname(os.path.realpath(__file__))
 
 if not os.path.exists('data'):
     os.makedirs('data')
@@ -20,7 +23,7 @@ if not os.path.exists('tmp'):
     os.makedirs('tmp')
 
 try:
-    with open(os.path.join('data','p_cfg.yaml'), 'r') as stream:
+    with open(os.path.join(DIR, 'data','p_cfg.yaml'), 'r') as stream:
         p_cfg = yaml.safe_load(stream)
 except FileNotFoundError:
     p_cfg = None
@@ -47,7 +50,7 @@ def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, univers
         sec["sector"] = row.findAll('td')[tickerPos-1+sectorPosOffset].text.strip()
         sec["universe"] = universe
         secs[sec["ticker"]] = sec
-    with open(os.path.join("tmp", "tickers.pickle"), "wb") as f:
+    with open(os.path.join(DIR, "tmp", "tickers.pickle"), "wb") as f:
         pickle.dump(secs, f)
     return secs
 
@@ -65,7 +68,7 @@ def get_resolved_securities():
 
 API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
 TD_API = cfg["TICKERS_API"]
-TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
+TICKER_DATA_OUTPUT = os.path.join(DIR, "data", "tickers_data.json")
 SECURITIES = get_resolved_securities().values()
 DATA_SOURCE = cfg["DATA_SOURCE"]
 
