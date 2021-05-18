@@ -25,6 +25,7 @@ TICKER_DATA_INPUT = os.path.join(DIR, "data", "tickers_data.json")
 ACCOUNT_VALUE = cfg["CASH"]
 RISK_FACTOR = cfg["RISK_FACTOR"]
 MAX_STOCKS = cfg["STOCKS_COUNT_OUTPUT"]
+SLOPE_DAYS = cfg["MOMENTUM_CALCULATION_PAST_DAYS"]
 
 if not os.path.exists('output'):
     os.makedirs('output')
@@ -70,10 +71,10 @@ def positions():
                 ma = pd.Series(closes).rolling(100).mean().tail(1).item()
                 if ma > closes[-1]:
                     print("Ticker %s below 100d moving average." % ticker)
-                    print(momentum(pd.Series(closes).tail(90)))
+                    print(momentum(pd.Series(closes).tail(SLOPE_DAYS)))
                 elif len(gaps):
                     print("Ticker %s has a gap > 15%%" % ticker)
-                    print(momentum(pd.Series(closes).tail(90)))
+                    print(momentum(pd.Series(closes).tail(SLOPE_DAYS)))
                 else:
                     momentums.append((0, ticker, json[ticker]["sector"], momentum(pd.Series(closes).tail(90)), atr_20(json[ticker]["candles"]), closes[-1]))
                     ranks.append(len(ranks)+1)

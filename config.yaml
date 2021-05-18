@@ -17,3 +17,7 @@ NQ100: true
 SP500: true
 SP400: false
 SP600: false
+
+# Calculation
+# Standard: 90
+MOMENTUM_CALCULATION_PAST_DAYS: 90
