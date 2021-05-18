@@ -1,4 +1,6 @@
-# TD Ameritrade Config
+# Data Retrieval
+# Available Sources: YAHOO, TD_AMERITRADE
+DATA_SOURCE: YAHOO
 API_KEY: Your_API_Key
 TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
 
@@ -11,7 +13,7 @@ STOCKS_COUNT_OUTPUT: 50
 
 # Choose your universe!
 # Only those stocks are considered which are included in the enabled indexes
+NQ100: true
 SP500: true
-NQ100: false
 SP400: false
 SP600: false

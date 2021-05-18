@@ -9,6 +9,8 @@ import pandas_datareader.data as web
 import pickle
 import requests
 import yaml
+import yfinance as yf
+import pandas as pd
 
 from datetime import date
 
@@ -32,7 +34,8 @@ except FileNotFoundError:
     cfg = None
 except yaml.YAMLError as exc:
         print(exc)
-
+            
+    
 def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, universe = "N/A"):
     resp = requests.get(url)
     soup = bs.BeautifulSoup(resp.text, 'lxml')
@@ -64,6 +67,7 @@ API_KEY = p_cfg["API_KEY"] if p_cfg else cfg["API_KEY"]
 TD_API = cfg["TICKERS_API"]
 TICKER_DATA_OUTPUT = os.path.join("data", "tickers_data.json")
 SECURITIES = get_resolved_securities().values()
+DATA_SOURCE = cfg["DATA_SOURCE"]
 
 def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""
@@ -81,19 +85,19 @@ def read_tickers(ticker_list=SECURITIES):
     with open(ticker_list, "r") as fp:
         return [ticker.strip() for ticker in fp.readlines()]
 
-def process_ticker_json(ticker_dict, ticker_response, security):
-    """Processes ticker json data into global ticker dict""" 
-    symbol = security["ticker"]
+def process_ticker_json(ticker_response, security):
     ticker_response["sector"] = security["sector"]
-    ticker_dict[symbol] = ticker_response 
 
-def main():
+def create_tickers_data_file(tickers_dict):
+    with open(TICKER_DATA_OUTPUT, "w") as fp:
+        json.dump(tickers_dict, fp)
+
+def save_from_tda(securities):
     headers = {"Cache-Control" : "no-cache"}
-    secs = SECURITIES
     params = construct_params()
-    ticker_dict = {}
+    tickers_dict = {}
 
-    for idx, sec in enumerate(secs):
+    for idx, sec in enumerate(securities):
         response = requests.get(
                 TD_API % sec["ticker"],
                 params=params,
@@ -101,11 +105,61 @@ def main():
         )
         # rate limit for td is 120 req/min
         time.sleep(0.5)
-        process_ticker_json(ticker_dict, response.json(), sec)
+        ticker_data = response.json()
+        process_ticker_json(ticker_data, sec)
+        tickers_dict[sec["ticker"]] = ticker_data
         print(f'{sec["universe"]}: {sec["ticker"]} {response.status_code}')
     
-    with open(TICKER_DATA_OUTPUT, "w") as fp:
-        json.dump(ticker_dict, fp)
+    create_tickers_data_file(tickers_dict)
+
+
+def get_yf_data(security, start_date, end_date):
+        print(f'{security["universe"]}: {security["ticker"]}')
+        df = yf.download(security["ticker"], start=start_date, end=end_date)
+        yahoo_response = df.to_dict()
+        timestamps = list(yahoo_response["Open"].keys())
+        timestamps = list(map(lambda timestamp: int(timestamp.timestamp()), timestamps))
+        opens = list(yahoo_response["Open"].values())
+        closes = list(yahoo_response["Close"].values())
+        lows = list(yahoo_response["Low"].values())
+        highs = list(yahoo_response["High"].values())
+        volumes = list(yahoo_response["Volume"].values())
+        ticker_data = {}
+        candles = []
+
+        for i in range(0, len(opens)):
+            candle = {}
+            candle["open"] = opens[i]
+            candle["close"] = closes[i]
+            candle["low"] = lows[i]
+            candle["high"] = highs[i]
+            candle["volume"] = volumes[i]
+            candle["datetime"] = timestamps[i]
+            candles.append(candle)
+
+        ticker_data["candles"] = candles
+        process_ticker_json(ticker_data, security)
+        return ticker_data
+
+def save_from_yahoo(securities):
+    today = date.today()
+    start_date = today - dt.timedelta(days=1*365)
+    tickers_dict = {}
+    for sec in securities:
+        ticker_data = get_yf_data(sec, start_date, today)
+        tickers_dict[sec["ticker"]] = ticker_data
+    create_tickers_data_file(tickers_dict)
+
+def save_data(source, securities):
+    if source == "YAHOO":
+        save_from_yahoo(securities)
+    elif source == "TD_AMERITRADE":
+        save_from_tda(securities)
+    
+
+def main():
+    save_data(DATA_SOURCE, SECURITIES)
+    
 
 if __name__ == "__main__":
     main()
