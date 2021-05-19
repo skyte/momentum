@@ -27,6 +27,7 @@ ACCOUNT_VALUE = cfg("CASH")
 RISK_FACTOR = cfg("RISK_FACTOR")
 MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
 SLOPE_DAYS = cfg("MOMENTUM_CALCULATION_PAST_DAYS")
+POS_COUNT_TARGET = cfg("POSITIONS_COUNT_TARGET")
 
 if not os.path.exists('output'):
     os.makedirs('output')
@@ -55,6 +56,23 @@ def atr_20(candles):
         daily_atr = max(high-low, np.abs(high - prev_close), np.abs(low - prev_close))
         daily_atrs.append(daily_atr)
     return pd.Series(daily_atrs).rolling(20).mean().tail(1).item()
+
+def calc_stocks_amount(account_value, risk_factor, risk_input):
+    return (np.floor(account_value * risk_factor / risk_input)).astype(int)
+
+def calc_pos_size(amount, price):
+    return np.round(amount * price, 2)
+
+def calc_sums(account_value, pos_size):
+    sums = []
+    sum = 0
+    stocks_count = 0
+    for position in list(pos_size):
+            sum = sum + position
+            sums.append(sum)
+            if sum < account_value:
+                stocks_count = stocks_count + 1
+    return (sums, stocks_count)
 
 def positions():
     """Returns a dataframe doubly sorted by deciles and momentum factor, with atr and position size"""
@@ -97,17 +115,21 @@ def positions():
     for slope_days in SLOPE_DAYS:
         slope_suffix = f'_{slope_days}' if slope_days != slope_std else ''
         df = pd.DataFrame(momentums[slope_days], columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
-        # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
-        df[title_amount] = (np.floor(ACCOUNT_VALUE * RISK_FACTOR / df[title_risk])).astype(int)
-        df[title_pos_size] = np.round(df[title_amount] * df[title_price], 2)
         df = df.sort_values(([title_momentum]), ascending=False)
         df[title_rank] = ranks
-        sum = 0
-        sums = []
-        for position in list(df[title_pos_size]):
-            sum = sum + position
-            sums.append(sum)
+        # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
+        df[title_amount] = calc_stocks_amount(ACCOUNT_VALUE, RISK_FACTOR, df[title_risk])
+        df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
+        (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[title_pos_size])
         df[title_sum] = sums
+        # recalculate for stocks target
+        if POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 5):
+            adjusted_risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
+            df[title_amount] = calc_stocks_amount(ACCOUNT_VALUE, adjusted_risk_factor, df[title_risk])
+            df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
+            (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[title_pos_size])
+            df[title_sum] = sums
+
         df.head(MAX_STOCKS).to_csv(os.path.join(DIR, "output", f'positions{slope_suffix}.csv'), index = False)
 
         watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")

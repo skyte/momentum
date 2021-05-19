@@ -41,7 +41,10 @@ def cfg(key):
     try:
         return private_config[key]
     except:
-        return config[key]
+        try:
+            return config[key]
+        except:
+            return None
 
 def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, universe = "N/A"):
     resp = requests.get(url)
