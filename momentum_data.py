@@ -12,6 +12,7 @@ import yaml
 import yfinance as yf
 import pandas as pd
 import dateutil.relativedelta
+import numpy as np
 
 from datetime import date
 from datetime import datetime
@@ -99,31 +100,48 @@ def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_typ
            ("frequency", frequency)
     )
 
-def print_data_progress(ticker, universe, idx, securities, error_text, seconds_elapsed):
-    dt1 = datetime.fromtimestamp(0)
-    dt2 = datetime.fromtimestamp(seconds_elapsed)
-    rd = dateutil.relativedelta.relativedelta (dt2, dt1)
-    print(f'{ticker} from {universe}{error_text} ({idx+1} / {len(securities)}). Elapsed: {rd.minutes}m {rd.seconds}s')
+def print_data_progress(ticker, universe, idx, securities, error_text, elapsed_s, remaining_s):
+    dt_ref = datetime.fromtimestamp(0)
+    dt_e = datetime.fromtimestamp(elapsed_s)
+    elapsed = dateutil.relativedelta.relativedelta (dt_e, dt_ref)
+    if remaining_s and not np.isnan(remaining_s):
+        dt_r = datetime.fromtimestamp(remaining_s)
+        remaining = dateutil.relativedelta.relativedelta (dt_r, dt_ref)
+        remaining_string = f'{remaining.minutes}m {remaining.seconds}s'
+    else:
+        remaining_string = "?"
+    print(f'{ticker} from {universe}{error_text} ({idx+1} / {len(securities)}). Elapsed: {elapsed.minutes}m {elapsed.seconds}s. Remaining: {remaining_string}.')
+
+def get_remaining_seconds(all_load_times, idx, len):
+    load_time_ma = pd.Series(all_load_times).rolling(np.minimum(idx+1, 25)).mean().tail(1).item()
+    remaining_seconds = (len - idx) * load_time_ma
+    return remaining_seconds
 
 def save_from_tda(securities):
     headers = {"Cache-Control" : "no-cache"}
     params = construct_params()
     tickers_dict = {}
     start = time.time()
+    load_times = []
 
     for idx, sec in enumerate(securities):
+        r_start = time.time()
         response = requests.get(
                 TD_API % sec["ticker"],
                 params=params,
                 headers=headers
         )
-        # rate limit for td is 120 req/min
-        time.sleep(0.5)
+        now = time.time()
+        current_load_time = now - r_start
+        load_times.append(current_load_time)
+        remaining_seconds = get_remaining_seconds(load_times, idx, len(securities))
         ticker_data = response.json()
         enrich_ticker_data(ticker_data, sec)
         tickers_dict[sec["ticker"]] = ticker_data
         error_text = f' Error with code {response.status_code}' if response.status_code != 200 else ''
-        print_data_progress(sec["ticker"], sec["universe"], idx, securities, error_text, time.time() - start)
+        print_data_progress(sec["ticker"], sec["universe"], idx, securities, error_text, now - start, remaining_seconds)
+        # rate limit for td is 120 req/min
+        time.sleep(0.5)
 
     create_tickers_data_file(tickers_dict)
 
@@ -160,9 +178,15 @@ def save_from_yahoo(securities):
     start = time.time()
     start_date = today - dt.timedelta(days=1*365)
     tickers_dict = {}
+    load_times = []
     for idx, security in enumerate(securities):
-        print_data_progress(security["ticker"], security["universe"], idx, securities, "", time.time() - start)
+        r_start = time.time()
         ticker_data = get_yf_data(security, start_date, today)
+        now = time.time()
+        current_load_time = now - r_start
+        load_times.append(current_load_time)
+        remaining_seconds = remaining_seconds = get_remaining_seconds(load_times, idx, len(securities))
+        print_data_progress(security["ticker"], security["universe"], idx, securities, "", time.time() - start, remaining_seconds)
         tickers_dict[security["ticker"]] = ticker_data
     create_tickers_data_file(tickers_dict)
 

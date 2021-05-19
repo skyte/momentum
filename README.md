@@ -48,12 +48,14 @@ Can be switched with the field `DATA_SOURCE`
 
 ##### Yahoo Finance
 
+Yahoo starts out fast but then the requests get throttled.
+
 - Is default, no config necessary.
 
-##### TD Ameritrade
+##### TD Ameritrade (a bit faster)
 
 1. Create TDAmeritrade Developer Account and App
-2. Put in your `API_KEY` in `config.yaml`
+2. Put in your `API_KEY` in `config.yaml` and change `DATA_SOURCE`.
 
 
 
