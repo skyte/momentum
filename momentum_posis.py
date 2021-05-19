@@ -122,8 +122,8 @@ def positions():
         df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
         (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[title_pos_size])
         df[title_sum] = sums
-        # recalculate for stocks target
-        if POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 5):
+        # recalculate for positions target
+        if POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
             adjusted_risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
             df[title_amount] = calc_stocks_amount(ACCOUNT_VALUE, adjusted_risk_factor, df[title_risk])
             df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
