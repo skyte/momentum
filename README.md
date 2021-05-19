@@ -40,7 +40,7 @@ Instead of running `momentum.py` you can also:
 
 #### Private File
 
-Copy `config.yaml` and name it `config_private.yaml`. Change whatever you want, it will take priority.
+You can create a `config_private.yaml` next to `config.yaml` and overwrite some parameters like `API_KEY`. That way you don't get conflicts when pulling a new version.
 
 #### Data Sources
 
