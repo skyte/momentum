@@ -38,7 +38,10 @@ except yaml.YAMLError as exc:
         print(exc)
 
 def cfg(key):
-    return private_config[key] if private_config else config[key]
+    try:
+        return private_config[key]
+    except:
+        return config[key]
 
 def getSecurities(url, tickerPos = 1, tablePos = 1, sectorPosOffset = 1, universe = "N/A"):
     resp = requests.get(url)
