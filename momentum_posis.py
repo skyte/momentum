@@ -117,6 +117,7 @@ def positions():
         df = pd.DataFrame(momentums[slope_days], columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
         df = df.sort_values(([title_momentum]), ascending=False)
         df[title_rank] = ranks
+        df = df.head(MAX_STOCKS)
         # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
         df[title_amount] = calc_stocks_amount(ACCOUNT_VALUE, RISK_FACTOR, df[title_risk])
         df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
@@ -130,7 +131,7 @@ def positions():
             (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[title_pos_size])
             df[title_sum] = sums
 
-        df.head(MAX_STOCKS).to_csv(os.path.join(DIR, "output", f'positions{slope_suffix}.csv'), index = False)
+        df.to_csv(os.path.join(DIR, "output", f'positions{slope_suffix}.csv'), index = False)
 
         watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")
         watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
