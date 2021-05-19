@@ -69,12 +69,12 @@ def get_resolved_securities():
 
 API_KEY = cfg("API_KEY")
 TD_API = cfg("TICKERS_API")
-TICKER_DATA_OUTPUT = os.path.join(DIR, "data", "tickers_data.json")
+PRICE_DATA_OUTPUT = os.path.join(DIR, "data", "price_history.json")
 SECURITIES = get_resolved_securities().values()
 DATA_SOURCE = cfg("DATA_SOURCE")
 
 def create_tickers_data_file(tickers_dict):
-    with open(TICKER_DATA_OUTPUT, "w") as fp:
+    with open(PRICE_DATA_OUTPUT, "w") as fp:
         json.dump(tickers_dict, fp)
 
 def enrich_ticker_data(ticker_response, security):

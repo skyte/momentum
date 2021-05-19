@@ -22,7 +22,7 @@ except FileNotFoundError:
 except yaml.YAMLError as exc:
         print(exc)
 
-TICKER_DATA_INPUT = os.path.join(DIR, "data", "tickers_data.json")
+PRICE_DATA = os.path.join(DIR, "data", "price_history.json")
 ACCOUNT_VALUE = cfg("CASH")
 RISK_FACTOR = cfg("RISK_FACTOR")
 MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
@@ -58,7 +58,7 @@ def atr_20(candles):
 
 def positions():
     """Returns a dataframe doubly sorted by deciles and momentum factor, with atr and position size"""
-    json = read_json(TICKER_DATA_INPUT)
+    json = read_json(PRICE_DATA)
     momentums = {}
     ranks = []
     for ticker in json:
@@ -120,7 +120,7 @@ def positions():
 
 
 def main():
-    posis = positions() 
+    posis = positions()
     print(posis[0])
 
 if __name__ == "__main__":
