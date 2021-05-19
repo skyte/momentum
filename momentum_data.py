@@ -11,8 +11,10 @@ import requests
 import yaml
 import yfinance as yf
 import pandas as pd
+import dateutil.relativedelta
 
 from datetime import date
+from datetime import datetime
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -97,10 +99,17 @@ def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_typ
            ("frequency", frequency)
     )
 
+def print_data_progress(ticker, universe, idx, securities, error_text, seconds_elapsed):
+    dt1 = datetime.fromtimestamp(0)
+    dt2 = datetime.fromtimestamp(seconds_elapsed)
+    rd = dateutil.relativedelta.relativedelta (dt2, dt1)
+    print(f'{ticker} from {universe}{error_text} ({idx+1} / {len(securities)}). Elapsed: {rd.minutes}m {rd.seconds}s')
+
 def save_from_tda(securities):
     headers = {"Cache-Control" : "no-cache"}
     params = construct_params()
     tickers_dict = {}
+    start = time.time()
 
     for idx, sec in enumerate(securities):
         response = requests.get(
@@ -113,8 +122,8 @@ def save_from_tda(securities):
         ticker_data = response.json()
         enrich_ticker_data(ticker_data, sec)
         tickers_dict[sec["ticker"]] = ticker_data
-        errorText = f' Error with code {response.status_code}' if response.status_code != 200 else ''
-        print(f'{sec["ticker"]} from {sec["universe"]}{errorText} ({idx+1} / {len(securities)})')
+        error_text = f' Error with code {response.status_code}' if response.status_code != 200 else ''
+        print_data_progress(sec["ticker"], sec["universe"], idx, securities, error_text, time.time() - start)
 
     create_tickers_data_file(tickers_dict)
 
@@ -148,10 +157,11 @@ def get_yf_data(security, start_date, end_date):
 
 def save_from_yahoo(securities):
     today = date.today()
+    start = time.time()
     start_date = today - dt.timedelta(days=1*365)
     tickers_dict = {}
     for idx, security in enumerate(securities):
-        print(f'{security["ticker"]} from {security["universe"]} ({idx+1} / {len(securities)})')
+        print_data_progress(security["ticker"], security["universe"], idx, securities, "", time.time() - start)
         ticker_data = get_yf_data(security, start_date, today)
         tickers_dict[security["ticker"]] = ticker_data
     create_tickers_data_file(tickers_dict)

@@ -44,6 +44,8 @@ You can create a `config_private.yaml` next to `config.yaml` and overwrite some 
 
 #### Data Sources
 
+Can be switched with the field `DATA_SOURCE`
+
 ##### Yahoo Finance
 
 - Is default, no config necessary.
