@@ -27,3 +27,7 @@ MOMENTUM_CALCULATION_PAST_DAYS:
   - 90
   # - 120
   # - 250
+
+# Program behavior
+# Should the program wait for you to hit enter to exit?
+EXIT_WAIT_FOR_ENTER: true

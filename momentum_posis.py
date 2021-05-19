@@ -144,6 +144,9 @@ def positions():
 def main():
     posis = positions()
     print(posis[0])
+    print("***\nYour 'positions.csv' is in the output folder.\n***")
+    if cfg("EXIT_WAIT_FOR_ENTER"):
+        input("Press Enter key to exit...")
 
 if __name__ == "__main__":
     main()

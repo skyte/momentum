@@ -6,8 +6,8 @@
 1. Open the latest successful run here: https://github.com/skyte/momentum/actions
 2. Download `exe-package` at the bottom (need to be logged in into github)
 3. Exctract the `momentum` folder and enter it
-4. Open `config.yaml` and put in your preferences 
-5. Run `momentum.exe`
+   - If needed open `config.yaml` and put in your preferences 
+4. Run `momentum.exe`
 
 
 
