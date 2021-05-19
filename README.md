@@ -48,9 +48,13 @@ Can be switched with the field `DATA_SOURCE`
 
 ##### Yahoo Finance
 
+(Benchmark: Loads 1500 Stocks in 20m)
+
 - Is default, no config necessary.
 
 ##### TD Ameritrade
+
+(Benchmark: Loads 1500 Stocks in 18m)
 
 1. Create TDAmeritrade Developer Account and App
 2. Put in your `API_KEY` in `config.yaml` and change `DATA_SOURCE`.
