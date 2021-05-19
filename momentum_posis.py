@@ -42,7 +42,7 @@ def momentum(closes):
     indices = np.arange(len(returns))
     slope, _, r, _, _ = linregress(indices, returns)
     # return ((1 + slope) ** 253) * (r**2)
-    return (((np.exp(slope) ** 253) - 1) * 100) * (r**2)
+    return (((np.exp(slope) ** 252) - 1) * 100) * (r**2)
 
 def atr_20(candles):
     """Calculates last 20d ATR"""
