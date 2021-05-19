@@ -118,6 +118,7 @@ def get_remaining_seconds(all_load_times, idx, len):
     return remaining_seconds
 
 def save_from_tda(securities):
+    print("*** Loading Stocks from TD Ameritrade ***")
     headers = {"Cache-Control" : "no-cache"}
     params = construct_params()
     tickers_dict = {}
@@ -174,6 +175,7 @@ def get_yf_data(security, start_date, end_date):
         return ticker_data
 
 def save_from_yahoo(securities):
+    print("*** Loading Stocks from Yahoo Finance ***")
     today = date.today()
     start = time.time()
     start_date = today - dt.timedelta(days=1*365)
