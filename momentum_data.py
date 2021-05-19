@@ -141,8 +141,6 @@ def save_from_tda(securities):
         tickers_dict[sec["ticker"]] = ticker_data
         error_text = f' Error with code {response.status_code}' if response.status_code != 200 else ''
         print_data_progress(sec["ticker"], sec["universe"], idx, securities, error_text, now - start, remaining_seconds)
-        # rate limit for td is 120 req/min
-        time.sleep(0.5)
 
     create_tickers_data_file(tickers_dict)
 
