@@ -82,10 +82,9 @@ def positions():
     for ticker in json:
         try:
             closes = list(map(lambda candle: candle["close"], json[ticker]["candles"]))
-            last_closes = closes[-SLOPE_DAYS[0]:]
             if closes:
                 # calculate gaps of the last 90 days
-                diffs = np.abs(pd.Series(last_closes).pct_change().diff()).dropna()
+                diffs = np.abs(pd.Series(closes[-SLOPE_DAYS[0]:]).pct_change().diff()).dropna()
                 gaps = diffs[diffs > 0.15]
                 ma = pd.Series(closes).rolling(100).mean().tail(1).item()
                 if ma > closes[-1]:
@@ -97,7 +96,7 @@ def positions():
                     for slope_days in SLOPE_DAYS:
                         if not slope_days in momentums:
                             momentums[slope_days] = []
-                        mmntm = momentum(pd.Series(last_closes))
+                        mmntm = momentum(pd.Series(closes[-slope_days:]))
                         momentums[slope_days].append((0, ticker, json[ticker]["sector"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
         except KeyError:
             print(f'Ticker {ticker} has corrupted data.')
