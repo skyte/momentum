@@ -29,6 +29,16 @@ MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
 SLOPE_DAYS = cfg("MOMENTUM_CALCULATION_PAST_DAYS")
 POS_COUNT_TARGET = cfg("POSITIONS_COUNT_TARGET")
 
+TITLE_RANK = "Rank"
+TITLE_TICKER = "Ticker"
+TITLE_SECTOR = "Sector"
+TITLE_MOMENTUM = "Momentum (%)"
+TITLE_RISK = "ATR20d"
+TITLE_PRICE = "Price"
+TITLE_AMOUNT = "Shares"
+TITLE_POS_SIZE = "Position ($)"
+TITLE_SUM = "Sum ($)"
+
 if not os.path.exists('output'):
     os.makedirs('output')
 
@@ -100,40 +110,31 @@ def positions():
                         momentums[slope_days].append((0, ticker, json[ticker]["sector"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
         except KeyError:
             print(f'Ticker {ticker} has corrupted data.')
-    title_rank = "Rank"
-    title_ticker = "Ticker"
-    title_sector = "Sector"
-    title_momentum = "Momentum (%)"
-    title_risk = "ATR20d"
-    title_price = "Price"
-    title_amount = "Shares"
-    title_pos_size = "Position ($)"
-    title_sum = "Sum ($)"
     slope_std = SLOPE_DAYS[0]
     dfs = []
     for slope_days in SLOPE_DAYS:
         slope_suffix = f'_{slope_days}' if slope_days != slope_std else ''
-        df = pd.DataFrame(momentums[slope_days], columns=[title_rank, title_ticker, title_sector, title_momentum, title_risk, title_price])
-        df = df.sort_values(([title_momentum]), ascending=False)
-        df[title_rank] = ranks
+        df = pd.DataFrame(momentums[slope_days], columns=[TITLE_RANK, TITLE_TICKER, TITLE_SECTOR, TITLE_MOMENTUM, TITLE_RISK, TITLE_PRICE])
+        df = df.sort_values(([TITLE_MOMENTUM]), ascending=False)
+        df[TITLE_RANK] = ranks
         df = df.head(MAX_STOCKS)
         # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
-        df[title_amount] = calc_stocks_amount(ACCOUNT_VALUE, RISK_FACTOR, df[title_risk])
-        df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
-        (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[title_pos_size])
-        df[title_sum] = sums
+        df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, RISK_FACTOR, df[TITLE_RISK])
+        df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_AMOUNT], df[TITLE_PRICE])
+        (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
+        df[TITLE_SUM] = sums
         # recalculate for positions target
         if POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
             adjusted_risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
-            df[title_amount] = calc_stocks_amount(ACCOUNT_VALUE, adjusted_risk_factor, df[title_risk])
-            df[title_pos_size] = calc_pos_size(df[title_amount], df[title_price])
-            (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[title_pos_size])
-            df[title_sum] = sums
+            df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, adjusted_risk_factor, df[TITLE_RISK])
+            df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_AMOUNT], df[TITLE_PRICE])
+            (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
+            df[TITLE_SUM] = sums
 
         df.to_csv(os.path.join(DIR, "output", f'positions{slope_suffix}.csv'), index = False)
 
         watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")
-        watchlist.write(','.join(df.head(MAX_STOCKS)[title_ticker]))
+        watchlist.write(','.join(df.head(MAX_STOCKS)[TITLE_TICKER]))
         watchlist.close()
 
         dfs.append(df)
