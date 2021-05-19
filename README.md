@@ -36,7 +36,7 @@ Instead of running `momentum.py` you can also:
 
 
 
-### Config
+## Config
 
 #### Private File
 
