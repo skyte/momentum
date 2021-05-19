@@ -82,16 +82,15 @@ PRICE_DATA_OUTPUT = os.path.join(DIR, "data", "price_history.json")
 SECURITIES = get_resolved_securities().values()
 DATA_SOURCE = cfg("DATA_SOURCE")
 
-def create_tickers_data_file(tickers_dict):
+def create_price_history_file(tickers_dict):
     with open(PRICE_DATA_OUTPUT, "w") as fp:
         json.dump(tickers_dict, fp)
 
 def enrich_ticker_data(ticker_response, security):
     ticker_response["sector"] = security["sector"]
 
-def construct_params(apikey=API_KEY, period_type="year", period=1, frequency_type="daily", frequency=1):
+def tda_params(apikey, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""
-
     return (
            ("apikey", apikey),
            ("periodType", period_type),
@@ -117,10 +116,10 @@ def get_remaining_seconds(all_load_times, idx, len):
     remaining_seconds = (len - idx) * load_time_ma
     return remaining_seconds
 
-def save_from_tda(securities):
+def load_prices_from_tda(securities):
     print("*** Loading Stocks from TD Ameritrade ***")
     headers = {"Cache-Control" : "no-cache"}
-    params = construct_params()
+    params = tda_params(API_KEY)
     tickers_dict = {}
     start = time.time()
     load_times = []
@@ -142,7 +141,7 @@ def save_from_tda(securities):
         error_text = f' Error with code {response.status_code}' if response.status_code != 200 else ''
         print_data_progress(sec["ticker"], sec["universe"], idx, securities, error_text, now - start, remaining_seconds)
 
-    create_tickers_data_file(tickers_dict)
+    create_price_history_file(tickers_dict)
 
 
 def get_yf_data(security, start_date, end_date):
@@ -172,7 +171,7 @@ def get_yf_data(security, start_date, end_date):
         enrich_ticker_data(ticker_data, security)
         return ticker_data
 
-def save_from_yahoo(securities):
+def load_prices_from_yahoo(securities):
     print("*** Loading Stocks from Yahoo Finance ***")
     today = date.today()
     start = time.time()
@@ -188,13 +187,13 @@ def save_from_yahoo(securities):
         remaining_seconds = remaining_seconds = get_remaining_seconds(load_times, idx, len(securities))
         print_data_progress(security["ticker"], security["universe"], idx, securities, "", time.time() - start, remaining_seconds)
         tickers_dict[security["ticker"]] = ticker_data
-    create_tickers_data_file(tickers_dict)
+    create_price_history_file(tickers_dict)
 
 def save_data(source, securities):
     if source == "YAHOO":
-        save_from_yahoo(securities)
+        load_prices_from_yahoo(securities)
     elif source == "TD_AMERITRADE":
-        save_from_tda(securities)
+        load_prices_from_tda(securities)
 
 
 def main():
