@@ -8,9 +8,9 @@ TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
 CASH: 5000
 # Arbitrary risk factor, the higher the factor the bigger each individual position
 RISK_FACTOR: 0.0020
-# Optional: Instead of RISK_FACTOR you can directly say how many positions you want in the portfolio
+# Optional: Instead of adjusting RISK_FACTOR you can directly say how many positions you want in the portfolio
 # Result is not exact!
-POSITIONS_COUNT_TARGET: 30
+POSITIONS_COUNT_TARGET: 25
 # How many stocks do you want to see in the end? This is just for info.
 STOCKS_COUNT_OUTPUT: 50
 
