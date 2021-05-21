@@ -24,7 +24,8 @@ except yaml.YAMLError as exc:
 
 PRICE_DATA = os.path.join(DIR, "data", "price_history.json")
 ACCOUNT_VALUE = cfg("CASH")
-RISK_FACTOR = cfg("RISK_FACTOR")
+RISK_FACTOR_CFG = cfg("RISK_FACTOR")
+RISK_FACTOR = RISK_FACTOR_CFG or 0.002
 MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
 SLOPE_DAYS = cfg("MOMENTUM_CALCULATION_PAST_DAYS")
 POS_COUNT_TARGET = cfg("POSITIONS_COUNT_TARGET")
@@ -124,7 +125,7 @@ def positions():
         (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
         df[TITLE_SUM] = sums
         # recalculate for positions target
-        if POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
+        if not RISK_FACTOR and POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
             adjusted_risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
             df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, adjusted_risk_factor, df[TITLE_RISK])
             df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_AMOUNT], df[TITLE_PRICE])

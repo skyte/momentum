@@ -6,13 +6,12 @@ TICKERS_API: "https://api.tdameritrade.com/v1/marketdata/%s/pricehistory"
 
 # Portfolio Cash Value in $
 CASH: 5000
-# Arbitrary risk factor, the higher the factor the bigger each individual position
-RISK_FACTOR: 0.0020
-# Optional: Instead of adjusting RISK_FACTOR you can directly say how many positions you want in the portfolio
-# Result is not exact!
+# How many positions you want in the portfolio. Result may not be exact!
 POSITIONS_COUNT_TARGET: 25
 # How many stocks do you want to see in the end? This is just for info.
 STOCKS_COUNT_OUTPUT: 50
+# Optional (Remove # sign for use): Instead of using POSITIONS_COUNT_TARGET you can also directly adjust the risk factor in the Clenows risk parity equation
+#RISK_FACTOR: 0.002
 
 # Choose your universe!
 # Only those stocks are considered which are included in the enabled indexes
