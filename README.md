@@ -65,5 +65,6 @@ Can be switched with the field `DATA_SOURCE`
 
 ### Momentum
 
-Exponential regression is calculated like in this TradingView Indicator: https://www.tradingview.com/script/QWHjwm4B-Exponential-Regression-Slope-Annualized-with-R-squared-Histogram/
+Exponential regression is calculated like in this Excel graphic from the book: http://www.followingthetrend.com/stocks-on-the-move-figures-and-charts/#prettyPhoto[gallery]/15/  
+There is also a TradingView Indicator available: https://www.tradingview.com/script/QWHjwm4B-Exponential-Regression-Slope-Annualized-with-R-squared-Histogram/
 
