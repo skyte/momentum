@@ -120,14 +120,13 @@ def positions():
         df[TITLE_RANK] = ranks
         df = df.head(MAX_STOCKS)
         # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
-        df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, RISK_FACTOR, df[TITLE_RISK])
-        df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_AMOUNT], df[TITLE_PRICE])
-        (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
-        df[TITLE_SUM] = sums
-        # recalculate for positions target
-        if not RISK_FACTOR and POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
-            adjusted_risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
-            df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, adjusted_risk_factor, df[TITLE_RISK])
+        risk_factor = RISK_FACTOR
+        calc_runs = 2
+        for run in range(1,calc_runs+1,1):
+            # recalculate for positions target
+            if run > 1 and not RISK_FACTOR_CFG and POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
+                risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
+            df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, risk_factor, df[TITLE_RISK])
             df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_AMOUNT], df[TITLE_PRICE])
             (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
             df[TITLE_SUM] = sums
