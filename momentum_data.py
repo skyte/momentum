@@ -88,6 +88,7 @@ def create_price_history_file(tickers_dict):
 
 def enrich_ticker_data(ticker_response, security):
     ticker_response["sector"] = security["sector"]
+    ticker_response["universe"] = security["universe"]
 
 def tda_params(apikey, period_type="year", period=1, frequency_type="daily", frequency=1):
     """Returns tuple of api get params. Uses clenow default values."""

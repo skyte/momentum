@@ -33,6 +33,7 @@ POS_COUNT_TARGET = cfg("POSITIONS_COUNT_TARGET")
 TITLE_RANK = "Rank"
 TITLE_TICKER = "Ticker"
 TITLE_SECTOR = "Sector"
+TITLE_UNIVERSE = "Universe"
 TITLE_MOMENTUM = "Momentum (%)"
 TITLE_RISK = "ATR20d"
 TITLE_PRICE = "Price"
@@ -108,14 +109,14 @@ def positions():
                         if not slope_days in momentums:
                             momentums[slope_days] = []
                         mmntm = momentum(pd.Series(closes[-slope_days:]))
-                        momentums[slope_days].append((0, ticker, json[ticker]["sector"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
+                        momentums[slope_days].append((0, ticker, json[ticker]["sector"], json[ticker]["universe"], mmntm, atr_20(json[ticker]["candles"]), closes[-1]))
         except KeyError:
             print(f'Ticker {ticker} has corrupted data.')
     slope_std = SLOPE_DAYS[0]
     dfs = []
     for slope_days in SLOPE_DAYS:
         slope_suffix = f'_{slope_days}' if slope_days != slope_std else ''
-        df = pd.DataFrame(momentums[slope_days], columns=[TITLE_RANK, TITLE_TICKER, TITLE_SECTOR, TITLE_MOMENTUM, TITLE_RISK, TITLE_PRICE])
+        df = pd.DataFrame(momentums[slope_days], columns=[TITLE_RANK, TITLE_TICKER, TITLE_SECTOR, TITLE_UNIVERSE, TITLE_MOMENTUM, TITLE_RISK, TITLE_PRICE])
         df = df.sort_values(([TITLE_MOMENTUM]), ascending=False)
         df[TITLE_RANK] = ranks
         df = df.head(MAX_STOCKS)
