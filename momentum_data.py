@@ -146,7 +146,8 @@ def load_prices_from_tda(securities):
 
 
 def get_yf_data(security, start_date, end_date):
-        df = yf.download(security["ticker"], start=start_date, end=end_date)
+        escaped_ticker = security["ticker"].replace(".","-")
+        df = yf.download(escaped_ticker, start=start_date, end=end_date)
         yahoo_response = df.to_dict()
         timestamps = list(yahoo_response["Open"].keys())
         timestamps = list(map(lambda timestamp: int(timestamp.timestamp()), timestamps))
