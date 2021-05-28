@@ -34,6 +34,7 @@ TITLE_RANK = "Rank"
 TITLE_TICKER = "Ticker"
 TITLE_SECTOR = "Sector"
 TITLE_UNIVERSE = "Universe"
+TITLE_PERCENTILE = "Percentile"
 TITLE_MOMENTUM = "Momentum (%)"
 TITLE_RISK = "ATR20d"
 TITLE_PRICE = "Price"
@@ -87,7 +88,7 @@ def calc_sums(account_value, pos_size):
     return (sums, stocks_count)
 
 def positions():
-    """Returns a dataframe doubly sorted by deciles and momentum factor, with atr and position size"""
+    """Returns a dataframe doubly sorted by momentum factor, with atr and position size"""
     json = read_json(PRICE_DATA)
     momentums = {}
     ranks = []
@@ -119,8 +120,8 @@ def positions():
         df = pd.DataFrame(momentums[slope_days], columns=[TITLE_RANK, TITLE_TICKER, TITLE_SECTOR, TITLE_UNIVERSE, TITLE_MOMENTUM, TITLE_RISK, TITLE_PRICE])
         df = df.sort_values(([TITLE_MOMENTUM]), ascending=False)
         df[TITLE_RANK] = ranks
+        # df[TITLE_PERCENTILE] = pd.qcut(df[TITLE_MOMENTUM], 100, labels=False)
         df = df.head(MAX_STOCKS)
-        # df["decile"] = pd.qcut(df["momentum %"], 10, labels=False)
         risk_factor = RISK_FACTOR
         calc_runs = 2
         for run in range(1,calc_runs+1,1):
