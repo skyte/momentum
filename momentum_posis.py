@@ -133,7 +133,7 @@ def positions():
             (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
             df[TITLE_SUM] = sums
 
-        df.to_csv(os.path.join(DIR, "output", f'positions{slope_suffix}.csv'), index = False)
+        df.to_csv(os.path.join(DIR, "output", f'mmtm_posis{slope_suffix}.csv'), index = False)
 
         watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")
         watchlist.write(','.join(df.head(MAX_STOCKS)[TITLE_TICKER]))
@@ -147,7 +147,7 @@ def positions():
 def main():
     posis = positions()
     print(posis[0])
-    print("***\nYour 'positions.csv' is in the output folder.\n***")
+    print("***\nYour 'mmtm_posis.csv' is in the output folder.\n***")
     if cfg("EXIT_WAIT_FOR_ENTER"):
         input("Press Enter key to exit...")
 
