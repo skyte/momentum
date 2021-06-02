@@ -38,7 +38,7 @@ TITLE_PERCENTILE = "Percentile"
 TITLE_MOMENTUM = "Momentum (%)"
 TITLE_RISK = "ATR20d"
 TITLE_PRICE = "Price"
-TITLE_AMOUNT = "Shares"
+TITLE_SHARES = "Shares"
 TITLE_POS_SIZE = "Position ($)"
 TITLE_SUM = "Sum ($)"
 
@@ -128,15 +128,25 @@ def positions():
             # recalculate for positions target
             if run > 1 and not RISK_FACTOR_CFG and POS_COUNT_TARGET and (stocks_count < POS_COUNT_TARGET or stocks_count - POS_COUNT_TARGET > 1):
                 risk_factor = RISK_FACTOR * (stocks_count / POS_COUNT_TARGET)
-            df[TITLE_AMOUNT] = calc_stocks_amount(ACCOUNT_VALUE, risk_factor, df[TITLE_RISK])
-            df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_AMOUNT], df[TITLE_PRICE])
+            df[TITLE_SHARES] = calc_stocks_amount(ACCOUNT_VALUE, risk_factor, df[TITLE_RISK])
+            df[TITLE_POS_SIZE] = calc_pos_size(df[TITLE_SHARES], df[TITLE_PRICE])
             (sums, stocks_count) = calc_sums(ACCOUNT_VALUE, df[TITLE_POS_SIZE])
             df[TITLE_SUM] = sums
 
         df.to_csv(os.path.join(DIR, "output", f'mmtm_posis{slope_suffix}.csv'), index = False)
 
         watchlist = open(os.path.join(DIR, "output", f'Momentum{slope_suffix}.txt'), "w")
-        watchlist.write(','.join(df.head(MAX_STOCKS)[TITLE_TICKER]))
+        first_10_pf = ""
+        tv_ticker_count = 0
+        for index, row in df.iterrows():
+            plus_sign = "" if tv_ticker_count == 0 else "+"
+            # TradingView only supports combining 10 Tickers :(((
+            if row[TITLE_POS_SIZE] > 0 and row[TITLE_SUM] <= ACCOUNT_VALUE and tv_ticker_count < 10:
+                tv_ticker_count = tv_ticker_count + 1
+                first_10_pf = f'{first_10_pf}{plus_sign}{row[TITLE_SHARES]}*{row[TITLE_TICKER]}'
+        # first_10_combined = f'{first_10_combined})/{tv_ticker_count}'
+        watchlist_stocks = ','.join(df.head(MAX_STOCKS)[TITLE_TICKER])
+        watchlist.write(f'{first_10_pf},{watchlist_stocks}')
         watchlist.close()
 
         dfs.append(df)
