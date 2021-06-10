@@ -21,10 +21,10 @@ SP400: false
 SP600: false
 
 # Calculation
-# Standard is 90, but you can have as many as you want
+# Standard is 125 (as per second book "Trading Evolved", 90 for the first book), but you can have as many as you want
 MOMENTUM_CALCULATION_PAST_DAYS:
-  - 90
-  # - 120
+  - 125
+  # - 90
   # - 250
 
 # If the gap between days is bigger than this percent value, the stock gets excluded

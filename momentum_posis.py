@@ -116,7 +116,7 @@ def positions():
                     print(f'{ticker} has a gap > {MAX_GAP}%')
                 else:
                     ranks.append(len(ranks)+1)
-                    for slope_days in SLOPE_DAYS:
+                    for idx, slope_days in enumerate(SLOPE_DAYS):
                         if not slope_days in momentums:
                             momentums[slope_days] = []
                         mmntm = momentum(pd.Series(closes[-slope_days:]))

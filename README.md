@@ -1,4 +1,4 @@
-# Momentum Stocks Screener in the Style of "Stocks on the Move" by Andreas Clenow
+# Momentum Stocks Screener in the Style of "Stocks on the Move" / "Trading Evolved" by Andreas Clenow
 ## How To Run
 
 ### Run EXE
