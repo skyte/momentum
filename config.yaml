@@ -27,6 +27,9 @@ MOMENTUM_CALCULATION_PAST_DAYS:
   # - 120
   # - 250
 
+# If the gap between days is bigger than this percent value, the stock gets excluded
+EXCLUDE_MAX_GAP_PCT: 15
+
 # Program behavior
 # Should the program wait for you to hit enter to exit?
 EXIT_WAIT_FOR_ENTER: true

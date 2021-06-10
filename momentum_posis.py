@@ -29,6 +29,7 @@ RISK_FACTOR = RISK_FACTOR_CFG or 0.002
 MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
 SLOPE_DAYS = cfg("MOMENTUM_CALCULATION_PAST_DAYS")
 POS_COUNT_TARGET = cfg("POSITIONS_COUNT_TARGET")
+MAX_GAP = cfg("EXCLUDE_MAX_GAP_PCT")
 
 TITLE_RANK = "Rank"
 TITLE_TICKER = "Ticker"
@@ -98,12 +99,12 @@ def positions():
             if closes:
                 # calculate gaps of the last 90 days
                 diffs = np.abs(pd.Series(closes[-SLOPE_DAYS[0]:]).pct_change().diff()).dropna()
-                gaps = diffs[diffs > 0.15]
+                gaps = diffs[diffs > MAX_GAP / 100.0]
                 ma = pd.Series(closes).rolling(100).mean().tail(1).item()
                 if ma > closes[-1]:
                     print("%s is below it's 100d moving average." % ticker)
                 elif len(gaps):
-                    print("%s has a gap > 15%%" % ticker)
+                    print(f'{ticker} has a gap > {MAX_GAP}%')
                 else:
                     ranks.append(len(ranks)+1)
                     for slope_days in SLOPE_DAYS:
