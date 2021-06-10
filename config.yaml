@@ -30,6 +30,9 @@ MOMENTUM_CALCULATION_PAST_DAYS:
 # If the gap between days is bigger than this percent value, the stock gets excluded
 EXCLUDE_MAX_GAP_PCT: 15
 
+# Do you want to exclude stocks if the MA100 is crossed during the whole slope period?
+EXCLUDE_ALL_MA_CROSSES: false
+
 # Program behavior
 # Should the program wait for you to hit enter to exit?
 EXIT_WAIT_FOR_ENTER: true

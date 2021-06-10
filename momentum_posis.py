@@ -30,6 +30,7 @@ MAX_STOCKS = cfg("STOCKS_COUNT_OUTPUT")
 SLOPE_DAYS = cfg("MOMENTUM_CALCULATION_PAST_DAYS")
 POS_COUNT_TARGET = cfg("POSITIONS_COUNT_TARGET")
 MAX_GAP = cfg("EXCLUDE_MAX_GAP_PCT")
+EXCLUDE_MA_CROSSES = cfg("EXCLUDE_ALL_MA_CROSSES")
 
 TITLE_RANK = "Rank"
 TITLE_TICKER = "Ticker"
@@ -97,12 +98,20 @@ def positions():
         try:
             closes = list(map(lambda candle: candle["close"], json[ticker]["candles"]))
             if closes:
+                closes_series = pd.Series(closes)
+                slope_series = closes_series.tail(SLOPE_DAYS[0])
+                mas = closes_series.rolling(100).mean().tail(SLOPE_DAYS[0])
+                ma_is_crossed = False
+                if (EXCLUDE_MA_CROSSES):
+                    ma_crosses = slope_series < mas
+                    ma_crosses = ma_crosses.where(ma_crosses == True).dropna()
+                    ma_is_crossed = ma_crosses.size > 0
                 # calculate gaps of the last 90 days
-                diffs = np.abs(pd.Series(closes[-SLOPE_DAYS[0]:]).pct_change().diff()).dropna()
+                diffs = np.abs(slope_series.pct_change().diff()).dropna()
                 gaps = diffs[diffs > MAX_GAP / 100.0]
-                ma = pd.Series(closes).rolling(100).mean().tail(1).item()
-                if ma > closes[-1]:
-                    print("%s is below it's 100d moving average." % ticker)
+                ma = mas.tail(1).item()
+                if ma > closes[-1] or ma_is_crossed:
+                    print("%s was below it's 100d moving average." % ticker)
                 elif len(gaps):
                     print(f'{ticker} has a gap > {MAX_GAP}%')
                 else:
