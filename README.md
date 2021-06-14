@@ -1,6 +1,9 @@
 # Momentum Stocks Screener in the Style of "Stocks on the Move" / "Trading Evolved" by Andreas Clenow
+  
+The idea of this script is coming from the discord server of https://www.reddit.com/r/hebelwerk/ which is https://discord.gg/hebelwerk.  
+My adjustments of the code are based on the initial version written by member `fcyolohama`.  
+  
 ## How To Run
-
 ### Run EXE
 
 1. Open the latest successful run here: https://github.com/skyte/momentum/actions
