@@ -97,7 +97,7 @@ def positions():
     for ticker in json:
         try:
             closes = list(map(lambda candle: candle["close"], json[ticker]["candles"]))
-            if closes:
+            if closes and len(closes) >= 250:
                 closes_series = pd.Series(closes)
                 slope_series = closes_series.tail(SLOPE_DAYS[0])
                 mas = closes_series.rolling(100).mean().tail(SLOPE_DAYS[0])
