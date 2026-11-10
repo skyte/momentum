@@ -1,3 +1,16 @@
+# !!! NOT MAINTAINED ANYMORE, NO SUPPORT !!!  
+---
+---
+---
+---
+---
+# !!! NOT MAINTAINED ANYMORE, NO SUPPORT !!!  
+---
+---
+---
+---
+---
+---
 # Momentum Stocks Screener in the Style of "Stocks on the Move" / "Trading Evolved" by Andreas Clenow
   
 The idea of this script is coming from the discord server of https://www.reddit.com/r/hebelwerk/ which is https://discord.gg/hebelwerk.  
